@@ -30,3 +30,13 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# SSH keys
+id_ed25519
+id_ed25519.pub
+
+# Compiled binary
+main
+
+# Dev notes
+context.md
