@@ -1,0 +1,24 @@
+server:
+  host: "0.0.0.0"
+  port: "2222"
+
+animation:
+  framerate_ms: 100
+  typing_speed_ms: 35
+  frames_dir: "assets/frames"
+
+style:
+  home_color: "#FFFFFF"
+  about_color: "15"
+  error_color: "9"
+
+content:
+  placeholder: "Try /home, /about, or whatever you feel like big dog."
+  about_text: |
+    Hey, I'm Ludwig — a developer who builds things for the terminal and the web.
+
+    I love Go, distributed systems, and developer tooling. When I'm not writing code,
+    you'll find me exploring new tech, reading about systems design, or tinkering with
+    side projects like this SSH portfolio you're looking at right now.
+
+    Type /home to go back, or /quit to disconnect.
