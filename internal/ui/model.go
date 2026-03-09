@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
+	"github.com/0xf6i/cli/internal/config"
 	"github.com/0xf6i/cli/internal/ui/components"
 )
 
@@ -28,6 +29,7 @@ const (
 )
 
 type Model struct {
+	cfg       config.Config
 	textInput textinput.Model
 	state     SessionState
 	terminalH int
@@ -48,28 +50,29 @@ type Model struct {
 	errMsg string
 }
 
-func NewModel() Model {
+func NewModel(cfg config.Config) Model {
 	ti := textinput.New()
-	ti.Placeholder = "Try /home, /about, or whatever you feel like big dog."
+	ti.Placeholder = cfg.Content.Placeholder
 	ti.Focus()
 	ti.ShowSuggestions = true
 	ti.SetSuggestions([]string{"/home", "/about", "/education", "/experience", "/quit"})
 
-	frames, err := components.LoadFrames("assets/frames")
+	frames, err := components.LoadFrames(cfg.Animation.FramesDir)
 	if err != nil {
 		frames = []string{"[ error loading frames ]"}
 	}
 
 	return Model{
+		cfg:       cfg,
 		state:     HomeState,
 		textInput: ti,
 		frames:    frames,
-		bioText:   bioContent,
+		bioText:   cfg.Content.AboutText,
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(textinput.Blink, animationTick())
+	return tea.Batch(textinput.Blink, animationTick(m.cfg.Animation.FramerateMs))
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -84,14 +87,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case animationTickMsg:
 		if m.state == HomeState {
 			m.frameCounter++
-			return m, animationTick()
+			return m, animationTick(m.cfg.Animation.FramerateMs)
 		}
 		return m, nil
 
 	case typingTickMsg:
 		if m.state == AboutState && m.bioIndex < len(m.bioText) {
 			m.bioIndex++
-			return m, typingTick()
+			return m, typingTick(m.cfg.Animation.TypingSpeedMs)
 		}
 		return m, nil
 
@@ -133,7 +136,7 @@ func (m Model) View() string {
 	// Error line
 	errLine := ""
 	if m.errMsg != "" {
-		errLine = lipgloss.NewStyle().Foreground(lipgloss.Color("9")).Render(m.errMsg) + "\n"
+		errLine = lipgloss.NewStyle().Foreground(lipgloss.Color(m.cfg.Style.ErrorColor)).Render(m.errMsg) + "\n"
 	}
 
 	input := m.textInput.View()

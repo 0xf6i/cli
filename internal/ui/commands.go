@@ -11,16 +11,16 @@ import (
 
 type animationTickMsg struct{}
 
-func animationTick() tea.Cmd {
-	return tea.Tick(100*time.Millisecond, func(time.Time) tea.Msg {
+func animationTick(ms int) tea.Cmd {
+	return tea.Tick(time.Duration(ms)*time.Millisecond, func(time.Time) tea.Msg {
 		return animationTickMsg{}
 	})
 }
 
 type typingTickMsg struct{}
 
-func typingTick() tea.Cmd {
-	return tea.Tick(35*time.Millisecond, func(time.Time) tea.Msg {
+func typingTick(ms int) tea.Cmd {
+	return tea.Tick(time.Duration(ms)*time.Millisecond, func(time.Time) tea.Msg {
 		return typingTickMsg{}
 	})
 }
@@ -38,12 +38,12 @@ func (m Model) handleCommand(input string) (Model, tea.Cmd) {
 	case "home":
 		m.state = HomeState
 		m.frameCounter = 0
-		return m, animationTick()
+		return m, animationTick(m.cfg.Animation.FramerateMs)
 
 	case "about":
 		m.state = AboutState
 		m.bioIndex = 0
-		return m, typingTick()
+		return m, typingTick(m.cfg.Animation.TypingSpeedMs)
 
 	case "quit", "exit":
 		return m, tea.Quit

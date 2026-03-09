@@ -10,7 +10,7 @@ func (m Model) viewHome() string {
 	frame := m.frames[m.frameCounter%len(m.frames)]
 
 	style := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#FFFFFF")).
+		Foreground(lipgloss.Color(m.cfg.Style.HomeColor)).
 		Bold(false)
 
 	rendered := style.Render(frame)

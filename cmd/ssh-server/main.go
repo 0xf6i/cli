@@ -7,25 +7,27 @@ import (
 
 	"github.com/charmbracelet/log"
 
+	"github.com/0xf6i/cli/internal/config"
 	sshserver "github.com/0xf6i/cli/internal/ssh"
 )
 
 func main() {
-	host := os.Getenv("SSH_HOST")
-	if host == "" {
-		host = "0.0.0.0"
+	cfgPath := os.Getenv("CONFIG_PATH")
+	if cfgPath == "" {
+		cfgPath = "config.yml"
 	}
 
-	port := os.Getenv("SSH_PORT")
-	if port == "" {
-		port = "2222"
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		log.Warn("Could not load config, using defaults", "err", err)
+		cfg, _ = config.Load("/dev/null") // triggers defaults
 	}
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		if err := sshserver.Start(host, port); err != nil {
+		if err := sshserver.Start(cfg); err != nil {
 			log.Fatal("Server error", "err", err)
 		}
 	}()
